@@ -30,7 +30,7 @@ brew install \
   gnupg
 
 # Git Credential Helper
-git config --global credential.helper store
+git config --global --replace-all credential.helper store
 
 # -------------------------------
 # Azure CLI
@@ -153,7 +153,11 @@ fi
 
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$HOME/.local/bin:$HOME/bin:$PATH"
+export PATH="/opt/homebrew/opt/curl/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$HOME/.local/bin:$HOME/bin:$PATH"
+
+# curl (keg-only) compiler flags
+export LDFLAGS="-L/opt/homebrew/opt/curl/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/curl/include"
 
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
