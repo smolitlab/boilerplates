@@ -12,6 +12,9 @@
 
 ## WSL - Ubuntu
 
+    Bootstrap Script
+
+    
 ## Windows
 
     VScode
