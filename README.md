@@ -1,9 +1,22 @@
-# boilerplates
+# Setting for my Workplace Setup
 
-[Kubectl Cheat Sheet](https://gist.github.com/smolit/311d339236d2186cb43a2c07ae85817d)
+## MacOS
 
-[Terraform Cheat Sheet](https://gist.github.com/smolit/4b07ebdebcac2450e6e7b61d3b1ad032)
+    VScode
 
-[Docker Cheat Sheet](https://gist.github.com/smolit/a78ea63d79ac9dfe8f5b810d386424e2)
+    VS Code User Settings Speicherort: 
+    
+    ~/Library/Application Support/Code/User/settings.json
+    ~/Library/Application Support/Code/User/keybindings.json
+    
 
-[Helm Cheat Sheet](https://gist.github.com/smolit/508aecc3e2611291dc7778d9559b1e01)
+## WSL - Ubuntu
+
+## Windows
+
+    VScode
+    
+    VS Code User Settings Speicherort: 
+    
+        %APPDATA%\Code\User\settings.json
+        %APPDATA%\Code\User\keybindings.json
