@@ -2,7 +2,7 @@
 
 ## ZSH and P10K Setup
 
-To change the Powerlevel10k you can run "p10k configure" the result will be saved in .p10kxxxx
+To change the Powerlevel10k you can run "p10k configure" the result will be saved in .p10k.zsh.
 
 ## MacOS
 
