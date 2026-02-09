@@ -6,7 +6,7 @@ yellow() { printf "\033[33m%s\033[0m\n" "$*"; }
 blue() { printf "\033[34m%s\033[0m\n" "$*"; }
 green() { printf "\033[32m%s\033[0m\n" "$*"; }
 
-blue "[1/14] System aktualisieren & Basiswerkzeuge installieren"
+blue "[1/15] System aktualisieren & Basiswerkzeuge installieren"
 sudo apt-get update -y
 sudo apt-get install -y \
   git curl wget unzip jq ca-certificates gnupg software-properties-common \
@@ -18,7 +18,7 @@ git config --global credential.helper store
 # -------------------------------
 # GitHub CLI
 # -------------------------------
-blue "[2/14] GitHub CLI installieren (oder pruefen)"
+blue "[2/15] GitHub CLI installieren (oder pruefen)"
 
 if ! command -v gh >/dev/null 2>&1; then
   sudo mkdir -p -m 755 /etc/apt/keyrings
@@ -38,7 +38,7 @@ gh --version | head -n 1
 # -------------------------------
 # Azure CLI
 # -------------------------------
-blue "[3/14] Azure CLI installieren (oder prüfen)"
+blue "[3/15] Azure CLI installieren (oder prüfen)"
 
 if ! command -v az >/dev/null 2>&1; then
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo -E bash
@@ -49,7 +49,7 @@ fi
 # -------------------------------
 # kubelogin
 # -------------------------------
-blue "[4/14] kubelogin installieren"
+blue "[4/15] kubelogin installieren"
 
 if ! command -v kubelogin >/dev/null 2>&1; then
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
@@ -71,7 +71,7 @@ kubelogin --version | head -n 1
 # -------------------------------
 # kubectl
 # -------------------------------
-blue "[5/14] kubectl installieren"
+blue "[5/15] kubectl installieren"
 
 if ! command -v kubectl >/dev/null 2>&1; then
   KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
@@ -84,9 +84,24 @@ else
 fi
 
 # -------------------------------
+# sveltosctl
+# -------------------------------
+blue "[6/15] sveltosctl installieren"
+
+if ! command -v sveltosctl >/dev/null 2>&1; then
+  SVELTOS_VERSION="$(curl -fsSL https://api.github.com/repos/projectsveltos/sveltosctl/releases/latest | grep tag_name | cut -d '"' -f 4)"
+  blue "sveltosctl Version: $SVELTOS_VERSION"
+  sudo wget -qO /usr/local/bin/sveltosctl \
+    "https://github.com/projectsveltos/sveltosctl/releases/download/${SVELTOS_VERSION}/sveltosctl-linux-amd64"
+  sudo chmod +x /usr/local/bin/sveltosctl
+else
+  yellow "sveltosctl bereits vorhanden."
+fi
+
+# -------------------------------
 # Helm
 # -------------------------------
-blue "[6/14] Helm installieren"
+blue "[7/15] Helm installieren"
 
 if ! command -v helm >/dev/null 2>&1; then
   curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -97,7 +112,7 @@ fi
 # -------------------------------
 # k9s
 # -------------------------------
-blue "[7/14] k9s installieren"
+blue "[8/15] k9s installieren"
 
 if ! command -v k9s >/dev/null 2>&1; then
   K9S_VERSION="$(curl -fsSL https://api.github.com/repos/derailed/k9s/releases/latest | grep tag_name | cut -d '"' -f 4)"
@@ -114,7 +129,7 @@ fi
 # -------------------------------
 # Terragrunt (Binary)
 # -------------------------------
-blue "[8/14] Terragrunt installieren"
+blue "[9/15] Terragrunt installieren"
 
 if ! command -v terragrunt >/dev/null 2>&1; then
   TG_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | grep tag_name | cut -d '"' -f 4)
@@ -128,7 +143,7 @@ fi
 # -------------------------------
 # OpenTofu (GitHub Binary → 100% Proxy-Safe)
 # -------------------------------
-blue "[9/14] OpenTofu installieren (GitHub Binary)"
+blue "[10/15] OpenTofu installieren (GitHub Binary)"
 
 if ! command -v tofu >/dev/null 2>&1; then
   VERSION=$(curl -fsSL https://api.github.com/repos/opentofu/opentofu/releases/latest \
@@ -150,7 +165,7 @@ fi
 # -------------------------------
 # ZSH
 # -------------------------------
-blue "[10/14] ZSH installieren"
+blue "[11/15] ZSH installieren"
 
 if ! command -v zsh >/dev/null 2>&1; then
   sudo apt-get install -y zsh
@@ -159,7 +174,7 @@ fi
 # -------------------------------
 # Oh-My-Zsh
 # -------------------------------
-blue "[11/14] Oh-My-Zsh installieren"
+blue "[12/15] Oh-My-Zsh installieren"
 
 OMZ_DIR="$HOME/.oh-my-zsh"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$OMZ_DIR/custom}"
@@ -172,7 +187,7 @@ else
 fi
 
 # Plugins
-blue "[12/14] Oh-My-Zsh Plugins & Powerlevel10k installieren"
+blue "[13/15] Oh-My-Zsh Plugins & Powerlevel10k installieren"
 
 git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
   "$ZSH_CUSTOM/plugins/zsh-autosuggestions" 2>/dev/null || true
@@ -187,7 +202,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
 # -------------------------------
 # ~/.zshrc schreiben
 # -------------------------------
-blue "[13/14] ~/.zshrc schreiben"
+blue "[14/15] ~/.zshrc schreiben"
 
 cat > "$HOME/.zshrc" <<"EOF"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -245,7 +260,7 @@ EOF
 # -------------------------------
 # ZSH als Default Shell (erst jetzt!)
 # -------------------------------
-blue "[14/14] ZSH als Default-Shell setzen"
+blue "[15/15] ZSH als Default-Shell setzen"
 
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   chsh -s "$(command -v zsh)" "$USER" || true
