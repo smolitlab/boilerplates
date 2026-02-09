@@ -6,7 +6,7 @@ yellow() { printf "\033[33m%s\033[0m\n" "$*"; }
 blue() { printf "\033[34m%s\033[0m\n" "$*"; }
 green() { printf "\033[32m%s\033[0m\n" "$*"; }
 
-blue "[1/13] System aktualisieren & Basiswerkzeuge installieren"
+blue "[1/14] System aktualisieren & Basiswerkzeuge installieren"
 sudo apt-get update -y
 sudo apt-get install -y \
   git curl wget unzip jq ca-certificates gnupg software-properties-common \
@@ -18,7 +18,7 @@ git config --global credential.helper store
 # -------------------------------
 # GitHub CLI
 # -------------------------------
-blue "[2/13] GitHub CLI installieren (oder pruefen)"
+blue "[2/14] GitHub CLI installieren (oder pruefen)"
 
 if ! command -v gh >/dev/null 2>&1; then
   sudo mkdir -p -m 755 /etc/apt/keyrings
@@ -38,7 +38,7 @@ gh --version | head -n 1
 # -------------------------------
 # Azure CLI
 # -------------------------------
-blue "[3/13] Azure CLI installieren (oder prüfen)"
+blue "[3/14] Azure CLI installieren (oder prüfen)"
 
 if ! command -v az >/dev/null 2>&1; then
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo -E bash
@@ -47,9 +47,31 @@ else
 fi
 
 # -------------------------------
+# kubelogin
+# -------------------------------
+blue "[4/14] kubelogin installieren"
+
+if ! command -v kubelogin >/dev/null 2>&1; then
+  curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
+    | gpg --dearmor \
+    | sudo tee /usr/share/keyrings/microsoft.gpg >/dev/null
+
+  UBUNTU_CODENAME="$(. /etc/os-release && echo "${VERSION_CODENAME}")"
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/microsoft-ubuntu-${UBUNTU_CODENAME}-prod ${UBUNTU_CODENAME} main" \
+    | sudo tee /etc/apt/sources.list.d/microsoft-ubuntu-prod.list >/dev/null
+
+  sudo apt-get update -y
+  sudo apt-get install -y kubelogin
+else
+  yellow "kubelogin bereits vorhanden."
+fi
+
+kubelogin --version | head -n 1
+
+# -------------------------------
 # kubectl
 # -------------------------------
-blue "[4/13] kubectl installieren"
+blue "[5/14] kubectl installieren"
 
 if ! command -v kubectl >/dev/null 2>&1; then
   KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
@@ -64,7 +86,7 @@ fi
 # -------------------------------
 # Helm
 # -------------------------------
-blue "[5/13] Helm installieren"
+blue "[6/14] Helm installieren"
 
 if ! command -v helm >/dev/null 2>&1; then
   curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -75,7 +97,7 @@ fi
 # -------------------------------
 # k9s
 # -------------------------------
-blue "[6/13] k9s installieren"
+blue "[7/14] k9s installieren"
 
 if ! command -v k9s >/dev/null 2>&1; then
   K9S_VERSION="$(curl -fsSL https://api.github.com/repos/derailed/k9s/releases/latest | grep tag_name | cut -d '"' -f 4)"
@@ -92,7 +114,7 @@ fi
 # -------------------------------
 # Terragrunt (Binary)
 # -------------------------------
-blue "[7/13] Terragrunt installieren"
+blue "[8/14] Terragrunt installieren"
 
 if ! command -v terragrunt >/dev/null 2>&1; then
   TG_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | grep tag_name | cut -d '"' -f 4)
@@ -106,7 +128,7 @@ fi
 # -------------------------------
 # OpenTofu (GitHub Binary → 100% Proxy-Safe)
 # -------------------------------
-blue "[8/13] OpenTofu installieren (GitHub Binary)"
+blue "[9/14] OpenTofu installieren (GitHub Binary)"
 
 if ! command -v tofu >/dev/null 2>&1; then
   VERSION=$(curl -fsSL https://api.github.com/repos/opentofu/opentofu/releases/latest \
@@ -128,7 +150,7 @@ fi
 # -------------------------------
 # ZSH
 # -------------------------------
-blue "[9/13] ZSH installieren"
+blue "[10/14] ZSH installieren"
 
 if ! command -v zsh >/dev/null 2>&1; then
   sudo apt-get install -y zsh
@@ -137,7 +159,7 @@ fi
 # -------------------------------
 # Oh-My-Zsh
 # -------------------------------
-blue "[10/13] Oh-My-Zsh installieren"
+blue "[11/14] Oh-My-Zsh installieren"
 
 OMZ_DIR="$HOME/.oh-my-zsh"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$OMZ_DIR/custom}"
@@ -150,7 +172,7 @@ else
 fi
 
 # Plugins
-blue "[11/13] Oh-My-Zsh Plugins & Powerlevel10k installieren"
+blue "[12/14] Oh-My-Zsh Plugins & Powerlevel10k installieren"
 
 git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
   "$ZSH_CUSTOM/plugins/zsh-autosuggestions" 2>/dev/null || true
@@ -165,7 +187,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
 # -------------------------------
 # ~/.zshrc schreiben
 # -------------------------------
-blue "[12/13] ~/.zshrc schreiben"
+blue "[13/14] ~/.zshrc schreiben"
 
 cat > "$HOME/.zshrc" <<"EOF"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -223,7 +245,7 @@ EOF
 # -------------------------------
 # ZSH als Default Shell (erst jetzt!)
 # -------------------------------
-blue "[13/13] ZSH als Default-Shell setzen"
+blue "[14/14] ZSH als Default-Shell setzen"
 
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   chsh -s "$(command -v zsh)" "$USER" || true
