@@ -6,7 +6,7 @@ yellow() { printf "\033[33m%s\033[0m\n" "$*"; }
 blue() { printf "\033[34m%s\033[0m\n" "$*"; }
 green() { printf "\033[32m%s\033[0m\n" "$*"; }
 
-blue "[1/12] System aktualisieren & Basiswerkzeuge installieren"
+blue "[1/13] System aktualisieren & Basiswerkzeuge installieren"
 sudo apt-get update -y
 sudo apt-get install -y \
   git curl wget unzip jq ca-certificates gnupg software-properties-common \
@@ -16,9 +16,29 @@ sudo apt-get install -y \
 git config --global credential.helper store
 
 # -------------------------------
+# GitHub CLI
+# -------------------------------
+blue "[2/13] GitHub CLI installieren (oder pruefen)"
+
+if ! command -v gh >/dev/null 2>&1; then
+  sudo mkdir -p -m 755 /etc/apt/keyrings
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
+  sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+    | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+  sudo apt-get update -y
+  sudo apt-get install -y gh
+else
+  yellow "GitHub CLI bereits vorhanden."
+fi
+
+gh --version | head -n 1
+
+# -------------------------------
 # Azure CLI
 # -------------------------------
-blue "[2/12] Azure CLI installieren (oder prüfen)"
+blue "[3/13] Azure CLI installieren (oder prüfen)"
 
 if ! command -v az >/dev/null 2>&1; then
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo -E bash
@@ -29,7 +49,7 @@ fi
 # -------------------------------
 # kubectl
 # -------------------------------
-blue "[3/12] kubectl installieren"
+blue "[4/13] kubectl installieren"
 
 if ! command -v kubectl >/dev/null 2>&1; then
   KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
@@ -44,7 +64,7 @@ fi
 # -------------------------------
 # Helm
 # -------------------------------
-blue "[4/12] Helm installieren"
+blue "[5/13] Helm installieren"
 
 if ! command -v helm >/dev/null 2>&1; then
   curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -55,7 +75,7 @@ fi
 # -------------------------------
 # k9s
 # -------------------------------
-blue "[5/12] k9s installieren"
+blue "[6/13] k9s installieren"
 
 if ! command -v k9s >/dev/null 2>&1; then
   K9S_VERSION="$(curl -fsSL https://api.github.com/repos/derailed/k9s/releases/latest | grep tag_name | cut -d '"' -f 4)"
@@ -72,7 +92,7 @@ fi
 # -------------------------------
 # Terragrunt (Binary)
 # -------------------------------
-blue "[6/12] Terragrunt installieren"
+blue "[7/13] Terragrunt installieren"
 
 if ! command -v terragrunt >/dev/null 2>&1; then
   TG_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | grep tag_name | cut -d '"' -f 4)
@@ -86,7 +106,7 @@ fi
 # -------------------------------
 # OpenTofu (GitHub Binary → 100% Proxy-Safe)
 # -------------------------------
-blue "[7/12] OpenTofu installieren (GitHub Binary)"
+blue "[8/13] OpenTofu installieren (GitHub Binary)"
 
 if ! command -v tofu >/dev/null 2>&1; then
   VERSION=$(curl -fsSL https://api.github.com/repos/opentofu/opentofu/releases/latest \
@@ -108,7 +128,7 @@ fi
 # -------------------------------
 # ZSH
 # -------------------------------
-blue "[8/12] ZSH installieren"
+blue "[9/13] ZSH installieren"
 
 if ! command -v zsh >/dev/null 2>&1; then
   sudo apt-get install -y zsh
@@ -117,7 +137,7 @@ fi
 # -------------------------------
 # Oh-My-Zsh
 # -------------------------------
-blue "[9/12] Oh-My-Zsh installieren"
+blue "[10/13] Oh-My-Zsh installieren"
 
 OMZ_DIR="$HOME/.oh-my-zsh"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$OMZ_DIR/custom}"
@@ -130,7 +150,7 @@ else
 fi
 
 # Plugins
-blue "[10/12] Oh-My-Zsh Plugins & Powerlevel10k installieren"
+blue "[11/13] Oh-My-Zsh Plugins & Powerlevel10k installieren"
 
 git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
   "$ZSH_CUSTOM/plugins/zsh-autosuggestions" 2>/dev/null || true
@@ -145,7 +165,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
 # -------------------------------
 # ~/.zshrc schreiben
 # -------------------------------
-blue "[11/12] ~/.zshrc schreiben"
+blue "[12/13] ~/.zshrc schreiben"
 
 cat > "$HOME/.zshrc" <<"EOF"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -203,7 +223,7 @@ EOF
 # -------------------------------
 # ZSH als Default Shell (erst jetzt!)
 # -------------------------------
-blue "[12/12] ZSH als Default-Shell setzen"
+blue "[13/13] ZSH als Default-Shell setzen"
 
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   chsh -s "$(command -v zsh)" "$USER" || true

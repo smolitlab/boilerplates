@@ -6,7 +6,7 @@ yellow() { printf "\033[33m%s\033[0m\n" "$*"; }
 blue() { printf "\033[34m%s\033[0m\n" "$*"; }
 green() { printf "\033[32m%s\033[0m\n" "$*"; }
 
-blue "[1/12] Homebrew & Basiswerkzeuge installieren"
+blue "[1/13] Homebrew & Basiswerkzeuge installieren"
 
 # Xcode Command Line Tools (optional, no-op if already installed)
 if ! xcode-select -p >/dev/null 2>&1; then
@@ -33,9 +33,22 @@ brew install \
 git config --global --replace-all credential.helper store
 
 # -------------------------------
+# GitHub CLI
+# -------------------------------
+blue "[2/13] GitHub CLI installieren (oder pruefen)"
+
+if ! command -v gh >/dev/null 2>&1; then
+  brew install gh
+else
+  yellow "GitHub CLI bereits vorhanden."
+fi
+
+gh --version | head -n 1
+
+# -------------------------------
 # Azure CLI
 # -------------------------------
-blue "[2/12] Azure CLI installieren (oder prüfen)"
+blue "[3/13] Azure CLI installieren (oder prüfen)"
 
 if ! command -v az >/dev/null 2>&1; then
   brew install azure-cli
@@ -46,7 +59,7 @@ fi
 # -------------------------------
 # kubectl
 # -------------------------------
-blue "[3/12] kubectl installieren"
+blue "[4/13] kubectl installieren"
 
 if ! command -v kubectl >/dev/null 2>&1; then
   brew install kubectl
@@ -57,7 +70,7 @@ fi
 # -------------------------------
 # Helm
 # -------------------------------
-blue "[4/12] Helm installieren"
+blue "[5/13] Helm installieren"
 
 if ! command -v helm >/dev/null 2>&1; then
   brew install helm
@@ -68,7 +81,7 @@ fi
 # -------------------------------
 # k9s
 # -------------------------------
-blue "[5/12] k9s installieren"
+blue "[6/13] k9s installieren"
 
 if ! command -v k9s >/dev/null 2>&1; then
   brew install k9s
@@ -79,7 +92,7 @@ fi
 # -------------------------------
 # Terragrunt
 # -------------------------------
-blue "[6/12] Terragrunt installieren"
+blue "[7/13] Terragrunt installieren"
 
 if ! command -v terragrunt >/dev/null 2>&1; then
   brew install terragrunt
@@ -90,7 +103,7 @@ fi
 # -------------------------------
 # OpenTofu
 # -------------------------------
-blue "[7/12] OpenTofu installieren"
+blue "[8/13] OpenTofu installieren"
 
 if ! command -v tofu >/dev/null 2>&1; then
   brew install opentofu
@@ -101,7 +114,7 @@ fi
 # -------------------------------
 # ZSH
 # -------------------------------
-blue "[8/12] ZSH installieren"
+blue "[9/13] ZSH installieren"
 
 if ! command -v zsh >/dev/null 2>&1; then
   brew install zsh
@@ -110,7 +123,7 @@ fi
 # -------------------------------
 # Oh-My-Zsh
 # -------------------------------
-blue "[9/12] Oh-My-Zsh installieren"
+blue "[10/13] Oh-My-Zsh installieren"
 
 OMZ_DIR="$HOME/.oh-my-zsh"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$OMZ_DIR/custom}"
@@ -123,7 +136,7 @@ else
 fi
 
 # Plugins
-blue "[10/12] Oh-My-Zsh Plugins & Powerlevel10k installieren"
+blue "[11/13] Oh-My-Zsh Plugins & Powerlevel10k installieren"
 
 mkdir -p "$ZSH_CUSTOM/plugins" "$ZSH_CUSTOM/themes"
 
@@ -140,7 +153,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
 # -------------------------------
 # ~/.zshrc schreiben
 # -------------------------------
-blue "[11/12] ~/.zshrc schreiben"
+blue "[12/13] ~/.zshrc schreiben"
 
 cat > "$HOME/.zshrc" <<"EOF"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -203,7 +216,7 @@ EOF
 # -------------------------------
 # ZSH als Default Shell (erst jetzt!)
 # -------------------------------
-blue "[12/12] ZSH als Default-Shell setzen"
+blue "[13/13] ZSH als Default-Shell setzen"
 
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   chsh -s "$(command -v zsh)" "$USER" || true
