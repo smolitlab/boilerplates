@@ -6,7 +6,7 @@ yellow() { printf "\033[33m%s\033[0m\n" "$*"; }
 blue() { printf "\033[34m%s\033[0m\n" "$*"; }
 green() { printf "\033[32m%s\033[0m\n" "$*"; }
 
-blue "[1/15] System aktualisieren & Basiswerkzeuge installieren"
+blue "[1/16] System aktualisieren & Basiswerkzeuge installieren"
 sudo apt-get update -y
 sudo apt-get install -y \
   git curl wget unzip jq ca-certificates gnupg software-properties-common \
@@ -18,7 +18,7 @@ git config --global credential.helper store
 # -------------------------------
 # GitHub CLI
 # -------------------------------
-blue "[2/15] GitHub CLI installieren (oder pruefen)"
+blue "[2/16] GitHub CLI installieren (oder pruefen)"
 
 if ! command -v gh >/dev/null 2>&1; then
   sudo mkdir -p -m 755 /etc/apt/keyrings
@@ -38,7 +38,7 @@ gh --version | head -n 1
 # -------------------------------
 # Azure CLI
 # -------------------------------
-blue "[3/15] Azure CLI installieren (oder prüfen)"
+blue "[3/16] Azure CLI installieren (oder prüfen)"
 
 if ! command -v az >/dev/null 2>&1; then
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo -E bash
@@ -49,7 +49,7 @@ fi
 # -------------------------------
 # kubelogin
 # -------------------------------
-blue "[4/15] kubelogin installieren"
+blue "[4/16] kubelogin installieren"
 
 if ! command -v kubelogin >/dev/null 2>&1; then
   curl -fsSL https://packages.microsoft.com/keys/microsoft.asc \
@@ -71,7 +71,7 @@ kubelogin --version | head -n 1
 # -------------------------------
 # kubectl
 # -------------------------------
-blue "[5/15] kubectl installieren"
+blue "[5/16] kubectl installieren"
 
 if ! command -v kubectl >/dev/null 2>&1; then
   KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)"
@@ -84,9 +84,27 @@ else
 fi
 
 # -------------------------------
+# stern
+# -------------------------------
+blue "[6/16] stern installieren"
+
+if ! command -v stern >/dev/null 2>&1; then
+  STERN_VERSION="$(curl -fsSL https://api.github.com/repos/stern/stern/releases/latest | grep tag_name | cut -d '"' -f 4)"
+  blue "stern Version: $STERN_VERSION"
+  curl -fsSL \
+    "https://github.com/stern/stern/releases/download/${STERN_VERSION}/stern_${STERN_VERSION#v}_linux_amd64.tar.gz" \
+    -o /tmp/stern.tar.gz
+  tar -C /tmp -xzf /tmp/stern.tar.gz stern
+  sudo mv /tmp/stern /usr/local/bin/stern
+  sudo chmod +x /usr/local/bin/stern
+else
+  yellow "stern bereits vorhanden."
+fi
+
+# -------------------------------
 # sveltosctl
 # -------------------------------
-blue "[6/15] sveltosctl installieren"
+blue "[7/16] sveltosctl installieren"
 
 if ! command -v sveltosctl >/dev/null 2>&1; then
   SVELTOS_VERSION="$(curl -fsSL https://api.github.com/repos/projectsveltos/sveltosctl/releases/latest | grep tag_name | cut -d '"' -f 4)"
@@ -101,7 +119,7 @@ fi
 # -------------------------------
 # Helm
 # -------------------------------
-blue "[7/15] Helm installieren"
+blue "[8/16] Helm installieren"
 
 if ! command -v helm >/dev/null 2>&1; then
   curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
@@ -112,7 +130,7 @@ fi
 # -------------------------------
 # k9s
 # -------------------------------
-blue "[8/15] k9s installieren"
+blue "[9/16] k9s installieren"
 
 if ! command -v k9s >/dev/null 2>&1; then
   K9S_VERSION="$(curl -fsSL https://api.github.com/repos/derailed/k9s/releases/latest | grep tag_name | cut -d '"' -f 4)"
@@ -129,7 +147,7 @@ fi
 # -------------------------------
 # Terragrunt (Binary)
 # -------------------------------
-blue "[9/15] Terragrunt installieren"
+blue "[10/16] Terragrunt installieren"
 
 if ! command -v terragrunt >/dev/null 2>&1; then
   TG_VERSION=$(curl -s https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | grep tag_name | cut -d '"' -f 4)
@@ -143,7 +161,7 @@ fi
 # -------------------------------
 # OpenTofu (GitHub Binary → 100% Proxy-Safe)
 # -------------------------------
-blue "[10/15] OpenTofu installieren (GitHub Binary)"
+blue "[11/16] OpenTofu installieren (GitHub Binary)"
 
 if ! command -v tofu >/dev/null 2>&1; then
   VERSION=$(curl -fsSL https://api.github.com/repos/opentofu/opentofu/releases/latest \
@@ -165,7 +183,7 @@ fi
 # -------------------------------
 # ZSH
 # -------------------------------
-blue "[11/15] ZSH installieren"
+blue "[12/16] ZSH installieren"
 
 if ! command -v zsh >/dev/null 2>&1; then
   sudo apt-get install -y zsh
@@ -174,7 +192,7 @@ fi
 # -------------------------------
 # Oh-My-Zsh
 # -------------------------------
-blue "[12/15] Oh-My-Zsh installieren"
+blue "[13/16] Oh-My-Zsh installieren"
 
 OMZ_DIR="$HOME/.oh-my-zsh"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$OMZ_DIR/custom}"
@@ -187,7 +205,7 @@ else
 fi
 
 # Plugins
-blue "[13/15] Oh-My-Zsh Plugins & Powerlevel10k installieren"
+blue "[14/16] Oh-My-Zsh Plugins & Powerlevel10k installieren"
 
 git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
   "$ZSH_CUSTOM/plugins/zsh-autosuggestions" 2>/dev/null || true
@@ -202,7 +220,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
 # -------------------------------
 # ~/.zshrc schreiben
 # -------------------------------
-blue "[14/15] ~/.zshrc schreiben"
+blue "[15/16] ~/.zshrc schreiben"
 
 cat > "$HOME/.zshrc" <<"EOF"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -251,6 +269,12 @@ alias ll='ls -laFh --color=auto'
 alias tf='tofu'
 alias tg='terragrunt'
 
+# kubectl autocomplete
+if command -v kubectl >/dev/null 2>&1; then
+  source <(kubectl completion zsh)
+  compdef k=kubectl
+fi
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
@@ -260,7 +284,7 @@ EOF
 # -------------------------------
 # ZSH als Default Shell (erst jetzt!)
 # -------------------------------
-blue "[15/15] ZSH als Default-Shell setzen"
+blue "[16/16] ZSH als Default-Shell setzen"
 
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   chsh -s "$(command -v zsh)" "$USER" || true
