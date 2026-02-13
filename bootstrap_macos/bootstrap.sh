@@ -138,16 +138,30 @@ fi
 # Plugins
 blue "[11/13] Oh-My-Zsh Plugins & Powerlevel10k installieren"
 
-mkdir -p "$ZSH_CUSTOM/plugins" "$ZSH_CUSTOM/themes"
-
 git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
   "$ZSH_CUSTOM/plugins/zsh-autosuggestions" 2>/dev/null || true
-
 git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting \
   "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" 2>/dev/null || true
-
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
   "$ZSH_CUSTOM/themes/powerlevel10k" 2>/dev/null || true
+
+# Ensure plugin and theme directories exist
+mkdir -p "$ZSH_CUSTOM/plugins" "$ZSH_CUSTOM/themes"
+
+# Remove and re-clone zsh-autosuggestions
+rm -rf "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions" && \
+  green "zsh-autosuggestions erfolgreich installiert." || yellow "Fehler beim Installieren von zsh-autosuggestions."
+
+# Remove and re-clone zsh-syntax-highlighting
+rm -rf "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" && \
+  green "zsh-syntax-highlighting erfolgreich installiert." || yellow "Fehler beim Installieren von zsh-syntax-highlighting."
+
+# Remove and re-clone powerlevel10k theme
+rm -rf "$ZSH_CUSTOM/themes/powerlevel10k"
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/themes/powerlevel10k" && \
+  green "powerlevel10k erfolgreich installiert." || yellow "Fehler beim Installieren von powerlevel10k."
 
 
 # -------------------------------
@@ -155,7 +169,11 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git \
 # -------------------------------
 blue "[12/13] ~/.zshrc schreiben"
 
-cat > "$HOME/.zshrc" <<"EOF"
+# Ensure HOME is set
+if [ -z "${HOME:-}" ]; then
+  yellow "HOME is not set. Cannot write ~/.zshrc."
+else
+  cat > "$HOME/.zshrc" <<"EOF"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -211,6 +229,22 @@ alias tg='terragrunt'
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 EOF
+  if [ $? -eq 0 ]; then
+    green "~/.zshrc erfolgreich geschrieben."
+  else
+    yellow "Fehler beim Schreiben von ~/.zshrc."
+  fi
+
+  # Copy .p10k.zsh from dotfiles if not present
+  if [ ! -f "$HOME/.p10k.zsh" ]; then
+    if [ -f "$(dirname "$0")/../dotfiles/.p10k.zsh" ]; then
+      cp "$(dirname "$0")/../dotfiles/.p10k.zsh" "$HOME/.p10k.zsh" && \
+        green "~/.p10k.zsh aus dotfiles erfolgreich kopiert." || yellow "Fehler beim Kopieren von .p10k.zsh aus dotfiles."
+    else
+      yellow ".p10k.zsh nicht in dotfiles gefunden, bitte manuell kopieren."
+    fi
+  fi
+fi
 
 
 # -------------------------------
