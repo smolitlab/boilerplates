@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+export PATH="/usr/local/bin:/usr/bin:/bin:$HOME/.local/bin:$HOME/bin"
+
 # Prevent running as root (except for individual sudo commands)
 if [ "$(id -u)" -eq 0 ]; then
   echo "\033[31mERROR: Please do NOT run this script as root or with sudo.\033[0m"
@@ -250,10 +252,10 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-
 export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
-export PATH="/usr/local/bin:/usr/bin:/bin:$HOME/.local/bin:$HOME/bin:$PATH"
+# Remove all Windows paths from PATH in WSL to avoid fallback to Windows executables
+export PATH="/usr/local/bin:/usr/bin:/bin:$HOME/.local/bin:$HOME/bin"
 
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
@@ -299,7 +301,8 @@ fi
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 EOF
-  if [ $? -eq 0 ]; then
+
+if [ $? -eq 0 ]; then
     green "~/.zshrc erfolgreich geschrieben."
   else
     yellow "Fehler beim Schreiben von ~/.zshrc."
