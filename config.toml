@@ -1,0 +1,12 @@
+[tools]
+gh = "latest"
+azure = "latest"
+azure-kubelogin = "latest"
+helm = "latest"
+k9s = "latest"
+kubectl = "latest"
+kubectx = "latest"
+opentofu = "latest"
+stern  = "latest"
+terragrunt = "latest"
+"github:projectsveltos/sveltosctl" = "latest"

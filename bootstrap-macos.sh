@@ -25,100 +25,35 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 brew update
-brew install \
-  git curl wget unzip jq \
-  gnupg
+brew install git curl wget unzip jq gnupg
 
 # Git Credential Helper
 git config --global --replace-all credential.helper store
 
 # -------------------------------
-# GitHub CLI
+# mise & config.toml
 # -------------------------------
-blue "[2/13] GitHub CLI installieren (oder pruefen)"
-
-if ! command -v gh >/dev/null 2>&1; then
-  brew install gh
+blue "[2/13] mise & Tools installieren"
+if ! command -v mise >/dev/null 2>&1; then
+  brew install mise
 else
-  yellow "GitHub CLI bereits vorhanden."
+  yellow "mise bereits vorhanden."
 fi
 
-gh --version | head -n 1
-
-# -------------------------------
-# Azure CLI
-# -------------------------------
-blue "[3/13] Azure CLI installieren (oder prüfen)"
-
-if ! command -v az >/dev/null 2>&1; then
-  brew install azure-cli
+# Copy config.toml to mise config directory
+mkdir -p "$HOME/.config/mise"
+if [ -f "$(dirname "$0")/config.toml" ]; then
+  cp "$(dirname "$0")/config.toml" "$HOME/.config/mise/config.toml"
+  green "config.toml erfolgreich kopiert."
 else
-  yellow "Azure CLI bereits vorhanden."
+  yellow "config.toml nicht gefunden, bitte manuell kopieren."
 fi
 
-# -------------------------------
-# kubectl
-# -------------------------------
-blue "[4/13] kubectl installieren"
+# Disable supply chain verification if needed (workaround for Rekor key error)
+export MISE_EXPERIMENTAL_SUPPLY_CHAIN_VERIFICATION=0
 
-if ! command -v kubectl >/dev/null 2>&1; then
-  brew install kubectl
-else
-  yellow "kubectl bereits vorhanden."
-fi
-
-# -------------------------------
-# Helm
-# -------------------------------
-blue "[5/13] Helm installieren"
-
-if ! command -v helm >/dev/null 2>&1; then
-  brew install helm
-else
-  yellow "Helm bereits vorhanden."
-fi
-
-# -------------------------------
-# k9s
-# -------------------------------
-blue "[6/13] k9s installieren"
-
-if ! command -v k9s >/dev/null 2>&1; then
-  brew install k9s
-else
-  yellow "k9s bereits vorhanden."
-fi
-
-# -------------------------------
-# Terragrunt
-# -------------------------------
-blue "[7/13] Terragrunt installieren"
-
-if ! command -v terragrunt >/dev/null 2>&1; then
-  brew install terragrunt
-else
-  yellow "Terragrunt bereits vorhanden."
-fi
-
-# -------------------------------
-# OpenTofu
-# -------------------------------
-blue "[8/13] OpenTofu installieren"
-
-if ! command -v tofu >/dev/null 2>&1; then
-  brew install opentofu
-else
-  yellow "OpenTofu bereits vorhanden."
-fi
-
-# -------------------------------
-# ZSH
-# -------------------------------
-blue "[9/13] ZSH installieren"
-
-if ! command -v zsh >/dev/null 2>&1; then
-  brew install zsh
-fi
+# Install all tools with mise
+mise install
 
 # -------------------------------
 # Oh-My-Zsh
@@ -237,8 +172,8 @@ EOF
 
   # Copy .p10k.zsh from dotfiles if not present
   if [ ! -f "$HOME/.p10k.zsh" ]; then
-    if [ -f "$(dirname "$0")/../dotfiles/.p10k.zsh" ]; then
-      cp "$(dirname "$0")/../dotfiles/.p10k.zsh" "$HOME/.p10k.zsh" && \
+    if [ -f "$(dirname "$0")/dotfiles/.p10k.zsh" ]; then
+      cp "$(dirname "$0")/dotfiles/.p10k.zsh" "$HOME/.p10k.zsh" && \
         green "~/.p10k.zsh aus dotfiles erfolgreich kopiert." || yellow "Fehler beim Kopieren von .p10k.zsh aus dotfiles."
     else
       yellow ".p10k.zsh nicht in dotfiles gefunden, bitte manuell kopieren."
