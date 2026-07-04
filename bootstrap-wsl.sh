@@ -144,6 +144,7 @@ export SAVEHIST=50000
 
 # Aliases
 alias k='kubectl'
+alias ks='k9s'
 alias ll='ls -laFh --color=auto'
 alias tf='tofu'
 alias tg='terragrunt'
