@@ -29,6 +29,9 @@ brew install git curl wget unzip jq gnupg
 
 # Git Credential Helper
 git config --global --replace-all credential.helper store
+git config --global core.autocrlf false
+git config --global core.eol lf
+git config --global core.safecrlf warn
 
 # -------------------------------
 # mise & config.toml
@@ -54,6 +57,23 @@ export MISE_EXPERIMENTAL_SUPPLY_CHAIN_VERIFICATION=0
 
 # Install all tools with mise
 mise install
+
+blue "[3/13] VS Code User Settings"
+VSCODE_SETTINGS_SOURCE="$(dirname "$0")/dotfiles/vscode/settings.json"
+VSCODE_SETTINGS_TARGET="$HOME/Library/Application Support/Code/User/settings.json"
+if [ -f "$VSCODE_SETTINGS_SOURCE" ]; then
+  mkdir -p "$(dirname "$VSCODE_SETTINGS_TARGET")"
+  if [ -f "$VSCODE_SETTINGS_TARGET" ]; then
+    tmp_settings="$(mktemp)"
+    jq -s '.[0] * .[1]' "$VSCODE_SETTINGS_TARGET" "$VSCODE_SETTINGS_SOURCE" > "$tmp_settings"
+    mv "$tmp_settings" "$VSCODE_SETTINGS_TARGET"
+  else
+    cp "$VSCODE_SETTINGS_SOURCE" "$VSCODE_SETTINGS_TARGET"
+  fi
+  green "VS Code User Settings erfolgreich aktualisiert."
+else
+  yellow "VS Code Settings Template nicht gefunden."
+fi
 
 # -------------------------------
 # Oh-My-Zsh

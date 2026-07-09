@@ -20,6 +20,9 @@ sudo apt-get install -y  git curl wget unzip jq ca-certificates gnupg software-p
 
 blue "[3/16] Git Credential Helper"
 git config --global credential.helper store
+git config --global core.autocrlf false
+git config --global core.eol lf
+git config --global core.safecrlf warn
 
 blue "[4/16] create directories"
 
@@ -53,11 +56,28 @@ else
 fi
 mise install
 
+blue "[7/16] VS Code Remote Settings"
+VSCODE_SETTINGS_SOURCE="$(dirname "$0")/dotfiles/vscode/settings.json"
+VSCODE_SETTINGS_TARGET="$HOME/.vscode-server/data/Machine/settings.json"
+if [ -f "$VSCODE_SETTINGS_SOURCE" ]; then
+  mkdir -p "$(dirname "$VSCODE_SETTINGS_TARGET")"
+  if [ -f "$VSCODE_SETTINGS_TARGET" ]; then
+    tmp_settings="$(mktemp)"
+    jq -s '.[0] * .[1]' "$VSCODE_SETTINGS_TARGET" "$VSCODE_SETTINGS_SOURCE" > "$tmp_settings"
+    mv "$tmp_settings" "$VSCODE_SETTINGS_TARGET"
+  else
+    cp "$VSCODE_SETTINGS_SOURCE" "$VSCODE_SETTINGS_TARGET"
+  fi
+  green "VS Code Remote Settings erfolgreich aktualisiert."
+else
+  yellow "VS Code Settings Template nicht gefunden."
+fi
+
 
 # -------------------------------
 # Oh-My-Zsh
 # -------------------------------
-blue "[7/16] Oh-My-Zsh installieren"
+blue "[8/16] Oh-My-Zsh installieren"
 
 OMZ_DIR="$HOME/.oh-my-zsh"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$OMZ_DIR/custom}"
@@ -71,7 +91,7 @@ fi
 
 # Plugins
 
-blue "[8/16] Oh-My-Zsh Plugins & Powerlevel10k installieren"
+blue "[9/16] Oh-My-Zsh Plugins & Powerlevel10k installieren"
 
 ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
 
@@ -95,7 +115,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$ZSH_CUSTOM/th
 # -------------------------------
 # ~/.zshrc schreiben
 # -------------------------------
-blue "[9/16] ~/.zshrc schreiben"
+blue "[10/16] ~/.zshrc schreiben"
 
 # Ensure HOME is set
 if [ -z "${HOME:-}" ]; then
@@ -183,7 +203,7 @@ fi
 # -------------------------------
 # ZSH als Default Shell (erst jetzt!)
 # -------------------------------
-blue "[10/16] ZSH als Default-Shell setzen"
+blue "[11/16] ZSH als Default-Shell setzen"
 
 if [ "$(basename "$SHELL")" != "zsh" ]; then
   chsh -s "$(command -v zsh)" "$USER" || true
